@@ -1,1 +1,1 @@
-[!](https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/OOjs_UI_icon_academic.svg/1200px-OOjs_UI_icon_academic.svg.png)
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/OOjs_UI_icon_academic.svg/1200px-OOjs_UI_icon_academic.svg.png)
