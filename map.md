@@ -9,7 +9,7 @@
     |-- package.json
     |-- assets
     |-- config
-       |-- config.json
+        |-- config.json
     |-- constants
     |-- server
         |-- index.js
