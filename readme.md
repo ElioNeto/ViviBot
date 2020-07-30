@@ -43,6 +43,11 @@ npm install
 ```
 
 
+## Project Structure
+
+[*Initial work*](map.md)
+
+
 ## Running the development instance
 
 ```
