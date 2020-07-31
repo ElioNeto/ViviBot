@@ -3,10 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "start": "node server",
+    "dev": "nodemon server"
+  },
   "dependencies": {
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "mongoose": "^5.9.26",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "os-utils": "^0.0.14"
   }
 }
