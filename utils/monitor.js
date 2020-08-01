@@ -14,3 +14,4 @@ module.exports = {
   percent_free_memory(){return("Free Memory (%): " + osutils.freememPercentage())},
   uptime(){return("System Uptime: " + osutils.sysUptime() + "ms")}
 }
+

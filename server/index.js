@@ -1,52 +1,61 @@
 const logger = require("../utils/logger.js").Logger;
 const Discord = require('discord.js')
-const config = require('../configs/config.json')
-const monitor = require('../utils/monitor')
 const dotenv = require('dotenv')
+const cmd = require('./commands')
 
+const express = require('express'); 
+const mongoose = require('mongoose');
+const axios = require('axios')
+
+const routes = require('./routes')
+const app = express();
+mongoose.connect('mongodb+srv://Elioneto:Elinho123@cluster0-zvkiv.mongodb.net/week10?retryWrites=true&w=majority', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+const db = mongoose.connection; 
+db.on('connected', () => {console.log('Mongoose default connection is open');});
+db.on('error', err => {console.log(`Mongoose default connection has occured \n${err}`);});
+db.on('disconnected', () => {console.log('Mongoose default connection is disconnected');});
+app.use(express.json());
+app.use(routes);
+app.listen(3334);
 const client = new Discord.Client()
 dotenv.config()
 client.login(process.env.TOKEN);
 logger.server("Initializing Server...");
 
-client.on('ready', () => {
-  console.log('Ready to use')
-  logger.server('Ready to use')
-  //server informations
-  logger.server(monitor.plataform())
-  monitor.cpu_use_server()
-  logger.server(monitor.avg())
-  logger.server(monitor.total_memory())
-  logger.server(monitor.free_memory())
-  logger.server(monitor.percent_free_memory())
-  logger.server(monitor.uptime())
-
-  debugInformations('Start')
-  botInfos('Start')
-  
+cmd.start()
+cmd.guildCreate()
+cmd.guildDelete()
+cmd.ping()
+cmd.document()
+cmd.consoleMsg()
+cmd.addUser()
+cmd.addUserMsgCollector()
+/* 
+axios.post('http://127.0.0.1:3334/newuser', {
+  user: 'teste',
+  objective: 'Flintstone',
+  day: 3,
+  lesson: 20
 })
+.then(function (response) {
+  console.log(response);
+})
+.catch(function (error) {
+  console.log(error);
+}); *//* 
 
-client.on("guildCreate", guild => {	
-  logger.info(`Bot start a server: ${guild.name} (id: ${guild.id}). Members: ${guild.memberCount}!`);
-  botInfos('guildCreate')
-});	
-
-client.on("guildDelete", guild => {	
-  logger.info(`Bot out a server: ${guild.name} (id: ${guild.id})`);	
-  botInfos('guildDelete')
-});
-
-function debugInformations(action){
-  logger.debug('Server ' + action + ' Action::: ' + monitor.avg())
-  logger.debug('Server ' + action + ' Action::: ' + monitor.total_memory())
-  logger.debug('Server ' + action + ' Action::: ' + monitor.free_memory())
-  logger.debug('Server ' + action + ' Action::: ' + monitor.percent_free_memory())
-  logger.debug('Server ' + action + ' Action::: ' + monitor.uptime())
-  logger.debug('Server ' + action + ' Action::: PING:' + Math.round(client.ws.ping) )
-}
-
-function botInfos(action){
-  logger.info(`Action: ${action}:::Bot start in ${client.users.cache.size} users.`)
-  logger.info(`Action: ${action}:::Bot start in ${client.channels.cache.size} channels.`)
-  logger.info(`Action: ${action}:::Bot start in ${client.guilds.cache.size} servers.`)
-}
+axios.get('http://127.0.0.1:3334/users')
+  .then(function (response) {
+    // handle success
+    console.log(response.data);
+  })
+  .catch(function (error) {
+    // handle error
+    console.log(error);
+  })
+  .finally(function () {
+    // always executed
+  }); */
