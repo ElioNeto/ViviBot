@@ -5,13 +5,13 @@ const cmd = require('./commands')
 
 const express = require('express'); 
 const mongoose = require('mongoose');
-const axios = require('axios')
 
 const routes = require('./routes')
 const app = express();
-mongoose.connect('mongodb+srv://Elioneto:Elinho123@cluster0-zvkiv.mongodb.net/week10?retryWrites=true&w=majority', {
+mongoose.connect(process.env.MONGO, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useFindAndModify: false
 })
 const db = mongoose.connection; 
 db.on('connected', () => {console.log('Mongoose default connection is open');});
@@ -33,29 +33,6 @@ cmd.document()
 cmd.consoleMsg()
 cmd.addUser()
 cmd.addUserMsgCollector()
-/* 
-axios.post('http://127.0.0.1:3334/newuser', {
-  user: 'teste',
-  objective: 'Flintstone',
-  day: 3,
-  lesson: 20
-})
-.then(function (response) {
-  console.log(response);
-})
-.catch(function (error) {
-  console.log(error);
-}); *//* 
-
-axios.get('http://127.0.0.1:3334/users')
-  .then(function (response) {
-    // handle success
-    console.log(response.data);
-  })
-  .catch(function (error) {
-    // handle error
-    console.log(error);
-  })
-  .finally(function () {
-    // always executed
-  }); */
+cmd.getUserByName()
+cmd.getAllUsers()
+cmd.updateLessonNumber()

@@ -3,6 +3,8 @@ const Discord = require('discord.js')
 const dotenv = require('dotenv')
 const logger = require("./logger.js").Logger;
 const monitor = require('./monitor')
+const axios = require('axios')
+const constants = require('../constants/constants.json')
 
 const client = new Discord.Client()
 dotenv.config()
@@ -29,9 +31,9 @@ auxFunctions.errorInformations = function(action){
 }
 
 auxFunctions.botInfos = function(action){
-  logger.info(`Action: ${action}:::Bot start in ${client.users.cache.size} users.`)
-  logger.info(`Action: ${action}:::Bot start in ${client.channels.cache.size} channels.`)
-  logger.info(`Action: ${action}:::Bot start in ${client.guilds.cache.size} servers.`)
+  logger.info(`Action: ${action}:::Bot in ${client.users.cache.size} users.`)
+  logger.info(`Action: ${action}:::Bot in ${client.channels.cache.size} channels.`)
+  logger.info(`Action: ${action}:::Bot in ${client.guilds.cache.size} servers.`)
 }
 
 auxFunctions.getCircularReplacer = function() {

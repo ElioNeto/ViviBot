@@ -13,26 +13,25 @@ const client = new Discord.Client()
 dotenv.config()
 client.login(process.env.TOKEN);
 
+const errrMessage001 = new Discord.MessageEmbed().setColor('#c00011').setDescription('Ocorreu um erro na gravação no banco de dados. Por favor, verifique os logs.')
+
 module.exports={
   start(){
-    return(
-      client.on('ready', () => {
-        console.log('Ready to use')
-        logger.server('Ready to use')
-        //server informations
-        logger.server(monitor.plataform())
-        monitor.cpu_use_server()
-        logger.server(monitor.avg())
-        logger.server(monitor.total_memory())
-        logger.server(monitor.free_memory())
-        logger.server(monitor.percent_free_memory())
-        logger.server(monitor.uptime())
-      
-        aux.debugInformations('Start')
-        aux.botInfos('Start')
-        
-      })
-    )
+    client.on('ready', () => {
+      console.log('Ready to use')
+      logger.server('Ready to use')
+      //server informations
+      logger.server(monitor.plataform())
+      monitor.cpu_use_server()
+      logger.server(monitor.avg())
+      logger.server(monitor.total_memory())
+      logger.server(monitor.free_memory())
+      logger.server(monitor.percent_free_memory())
+      logger.server(monitor.uptime())
+      aux.debugInformations('Start')
+      aux.botInfos('Start')
+    })
+    
   },
   guildCreate(){
     return(
@@ -157,6 +156,7 @@ module.exports={
       client.on('message', message => {
         if(message.author.bot) return;
         if(!message.content.startsWith(config.monitorPrefix)) return;
+        //if(!['660791006685298689'].includes(message.author.id)) return message.reply('nao pode, só a mamae <3')
     
         const args = message.content.slice(config.monitorPrefix.length).trim().split(/ +/g);
         const comando = args.shift().toLowerCase();
@@ -166,7 +166,8 @@ module.exports={
           let a2 = new Discord.MessageEmbed().setDescription('Informe o objetivo desejado')
           let a3 = new Discord.MessageEmbed().setDescription(`Informa o número de aulas por semana`)
           let a4 = new Discord.MessageEmbed().setDescription(`Informe o total de aulas contratado`)
-
+          aux.botInfos('addUserMsgCollector')
+          aux.debugInformations('addUserMsgCollector')
           message.channel.send(a1).then( () => {
             message.channel.createMessageCollector(x => x.author.id == message.author.id, {max: 1}).on('collect', c => {
               let username = c.content
@@ -181,9 +182,9 @@ module.exports={
                           lesson = c.content
                           let a8 = new Discord.MessageEmbed()
                             .setDescription(`Deseja gravar as seguintes informações?`)
-                            .addField('Username', username, true)
-                            .addField('Objective', objective, true)
-                            .addField('Days', day, true)
+                            .addField('Username', username)
+                            .addField('Objective', objective)
+                            .addField('Days', day)
                             .addField('Lesson', lesson, true)
                           message.channel.send(a8).then(msg => {                                                                       
                             msg.react('👍🏻').then(() => msg.react('👎🏻'))   
@@ -201,9 +202,22 @@ module.exports={
                                   lesson: lesson
                                 }).then(function (response) {
                                   //console.log(response);
+                                  console.log(response.data)
+                                  if(response.data === 100) {
+                                    console.log(response.data)
+                                    logger.error(constants.API_HOST)
+                                    logger.error(JSON.stringify(response, aux.getCircularReplacer()))
+                                    logger.error('Usuário já existe no banco de dados. Username: ' + username )
+                                    a9.setDescription('Usuário já existe no banco de dados.').setColor('#c00011')
+                                    message.channel.bulkDelete(9)
+                                    message.channel.send(a9)  
+                                    msg.delete()
+                                    return
+                                  }
                                   logger.info(constants.API_HOST)
                                   logger.info(JSON.stringify(response, aux.getCircularReplacer()))
                                   a9
+                                    .setColor('#6afa11')
                                     .setDescription('Gravado com sucesso!')
                                     .addField('Username', username, true)
                                     .addField('Objective', objective, true)
@@ -217,7 +231,7 @@ module.exports={
                                   logger.error(constants.API_HOST)
                                   logger.error(JSON.stringify(error, aux.getCircularReplacer()))
                                   //logger.error(error);
-                                  a9.setDescription('Ocorreu um erro na gravação no banco de dados.')
+                                  a9.setDescription('Ocorreu um erro na gravação no banco de dados.').setColor('#c00011')
                                   message.channel.bulkDelete(9)
                                   message.channel.send(a9)  
                                   msg.delete()
@@ -243,5 +257,207 @@ module.exports={
         }
       })
     )
+  },
+  getUserByName(){
+    return(
+      client.on('message', message => {
+        if(message.author.bot) return;
+        if(!message.content.startsWith(config.monitorPrefix)) return;
+    
+        const args = message.content.slice(config.monitorPrefix.length).trim().split(/ +/g);
+        const comando = args.shift().toLowerCase();
+      
+        if(comando === "user") {
+          msgArray = message.content.split(' ')
+          msgArray = message.content.split(' ')
+          msgPrefixLength = msgArray[0].length
+          msgCmdLength = msgArray[1].length
+          initial = msgPrefixLength + msgCmdLength + 2
+          msgUsername = message.content.substr(initial, message.content.length)
+
+          let a9 = new Discord.MessageEmbed()
+          axios.get(constants.API_GET_NAME, {
+            params: {
+              user: msgUsername
+            }
+          })
+          .then(function (response) {
+            logger.info(constants.API_GET_NAME)
+            logger.info(JSON.stringify(response, aux.getCircularReplacer()))
+            if(!response.data){
+              logger.info(constants.API_GET_NAME)
+              logger.info(JSON.stringify(response, aux.getCircularReplacer()))
+              logger.info('Usuário não encontrado. Revise os dados e informe o nome completo do usuário. Para maiores informações, entrar em contato com o Suporte Técnico')
+              a9.setDescription('Usuário não encontrado. Revise os dados e informe o nome completo do usuário. Para maiores informações, entrar em contato com o Suporte Técnico').setColor('#c00011')
+              message.channel.send(a9)  
+              return
+            }
+            a9
+              .setColor('#6afa11')
+              .setAuthor(response.data.user)
+              .setDescription(response.data.objective)
+              .addField('Dias na semana', response.data.day, true)
+              .addField('Lições restantes', response.data.lesson, true)
+            message.channel.send(a9)  
+          })
+          .catch(function (error) {
+            logger.error(constants.API_GET_NAME)
+            logger.error(JSON.stringify(error, aux.getCircularReplacer()))
+          })
+        }
+      })
+    )
+  },
+  getAllUsers(){
+    return(
+      client.on('message', message => {
+        if(message.author.bot) return;
+        if(!message.content.startsWith(config.monitorPrefix)) return;
+    
+        const args = message.content.slice(config.monitorPrefix.length).trim().split(/ +/g);
+        const comando = args.shift().toLowerCase();
+      
+        if(comando === "users") {
+         
+          let a9 = new Discord.MessageEmbed()
+          axios.get(constants.API_GET_USERS)
+          .then(function (response) {
+            logger.info(constants.API_GET_USERS)
+            logger.info(JSON.stringify(response, aux.getCircularReplacer()))
+            if(!response.data){
+              logger.info(constants.API_GET_USERS)
+              logger.info(JSON.stringify(response, aux.getCircularReplacer()))
+              logger.info('Usuário não encontrado. Revise os dados e informe o nome completo do usuário. Para maiores informações, entrar em contato com o Suporte Técnico')
+              a9.setDescription('Usuário não encontrado. Revise os dados e informe o nome completo do usuário. Para maiores informações, entrar em contato com o Suporte Técnico').setColor('#c00011')
+              message.channel.send(a9)  
+              return
+            }
+            data = response.data
+            //a9.addField('Username', response.data.user)
+            //message.channel.send(a9)
+            data.map(res => {
+              a9
+              .addField('Username', res.user, true)
+              .addField('Objective', res.objective,true)
+              .setColor('#0a2630')
+              .addField('####', '#####', true)
+            }) 
+            message.channel.send(a9)
+          })
+          .catch(function (error) {
+            logger.error(constants.API_GET_NAME)
+            logger.error(JSON.stringify(error, aux.getCircularReplacer()))
+          })
+        }
+      })
+    )
+  },
+  updateLessonNumber(){
+    client.on('message', message => {
+      if(message.author.bot) return;
+      if(!message.content.startsWith(config.monitorPrefix)) return;
+  
+      const args = message.content.slice(config.monitorPrefix.length).trim().split(/ +/g);
+      const comando = args.shift().toLowerCase();
+    
+      if(comando === "update-lesson") {
+        let a1 = new Discord.MessageEmbed().setDescription(`Informe o usuário`)
+        let a2 = new Discord.MessageEmbed().setDescription('A Aula foi realizada?')
+        let a3 = new Discord.MessageEmbed().setDescription(`Deseja adicionar mais aulas?`)
+        let a4 = new Discord.MessageEmbed().setDescription(`Quantas aulas?`)
+        
+        let s1 = new Discord.MessageEmbed().setDescription('Dados gravados com sucesso!')
+
+        let e1 = new Discord.MessageEmbed().setDescription('Usuário não encontrado. Revise os dados e informe o nome completo do usuário. Para maiores informações, entrar em contato com o Suporte Técnico').setColor('#c00011')
+        let e2 = new Discord.MessageEmbed().setDescription('Cancelado').setColor('#c00011')
+
+        aux.botInfos('updateLessonNumber')
+        aux.debugInformations('updateLessonNumber')
+        console.log('!m update-lesson')
+
+        message.channel.send(a1).then(()=> {
+          message.channel.createMessageCollector(x => x.author.id == message.author.id, {max:1}).on('collect', c => {
+            let username = c.content
+            axios.get(constants.API_GET_NAME, {
+              params: {
+                user: username
+              }
+            })
+            .then(function (response) {
+              if(!response.data){
+                logger.info(JSON.stringify(response, aux.getCircularReplacer()))
+                logger.info('Usuário não encontrado. Revise os dados e informe o nome completo do usuário. Para maiores informações, entrar em contato com o Suporte Técnico')
+                message.channel.send(e1)  
+                return
+              }
+              let totalLessons = response.data.lesson
+              a2.addField('Aulas restantes', totalLessons)
+              message.channel.send(a2).then((msg)=> {
+                msg.react('👍🏻').then(() => msg.react('👎🏻'))  
+                const filter = (reaction, user) => { 
+                  return ['👍🏻', '👎🏻'].includes(reaction.emoji.name) && user.id === message.author.id; 
+                };
+                msg.awaitReactions(filter, {max:1}).then(collected => {
+                  const reaction = collected.first()
+                  if (reaction.emoji.name === '👍🏻') {
+                    let newLessonNumber = totalLessons - 1
+                    console.log(newLessonNumber)
+                    console.log(constants.API_UPDATE_LESSON_BASE+username)
+                    axios.put(constants.API_UPDATE_LESSON_BASE+username,{lesson: newLessonNumber})
+                    .then(function(response){
+                      logger.info(JSON.stringify(response, aux.getCircularReplacer()))
+                      message.channel.bulkDelete(3)
+                      message.channel.send(s1)  
+                      msg.delete()
+                    })
+                    .catch(function(error){
+                      logger.error(JSON.stringify(error, aux.getCircularReplacer()))
+                      message.channel.send(errrMessage001)
+                    })
+                  }else if(reaction.emoji.name === '👎🏻'){
+
+
+                    message.channel.send(a3).then((msg)=> {
+                      msg.react('👍🏻').then(()=> msg.react('👎🏻'))
+                      const filter = (reaction, user) => {
+                        return ['👍🏻', '👎🏻'].includes(reaction.emoji.name) && user.id === message.author.id
+                      }
+                      msg.awaitReactions(filter, {max:1}).then(collected => {
+                        const reaction = collected.first()
+                        if (reaction.emoji.name === '👍🏻') {
+                          message.channel.send(a4).then(()=> {
+                            message.channel.createMessageCollector(x => x.author.id == message.author.id, {max:1}).on('collect', c => {
+                              lessons = c.content
+                              moreLesson = parseInt(totalLessons) + parseInt(lessons)
+                              axios.put(constants.API_UPDATE_LESSON_BASE+username,{lesson: moreLesson})
+                              .then(function(response){
+                                logger.info(JSON.stringify(response, aux.getCircularReplacer()))
+                                message.channel.bulkDelete(6)
+                                message.channel.send(s1)  
+                                msg.delete()
+                              })
+                              .catch(function(error){
+                                logger.error(JSON.stringify(error, aux.getCircularReplacer()))
+                                message.channel.send(errrMessage001)
+                              })
+                            })
+                          })
+                        }else if(reaction.emoji.name === '👎🏻'){
+                          message.channel.send(e2)
+                        }
+                      })
+                    })
+                  }
+                })
+              })
+            })
+            .catch(function (error) {
+              logger.error(JSON.stringify(error, aux.getCircularReplacer()))
+              send.channel.send(errrMessage001)
+            })
+          })
+        })
+      }
+    })
   }
-}
+} 
