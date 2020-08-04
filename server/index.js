@@ -2,6 +2,7 @@ const logger = require("../utils/logger.js").Logger;
 const Discord = require('discord.js')
 const dotenv = require('dotenv')
 const cmd = require('./commands')
+const material = require('./commands/material')
 
 const express = require('express'); 
 const mongoose = require('mongoose');
@@ -36,3 +37,5 @@ cmd.addUserMsgCollector()
 cmd.getUserByName()
 cmd.getAllUsers()
 cmd.updateLessonNumber()
+cmd.help()
+material.getTxt()

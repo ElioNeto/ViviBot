@@ -1,4 +1,5 @@
 {
   "translatePrefix":"!t",
-  "monitorPrefix": "!m"
+  "monitorPrefix": "!m",
+  "materialPrefix": "!material"
 }
