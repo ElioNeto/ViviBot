@@ -1,0 +1,7 @@
+{
+  "API_HOST":"http://127.0.0.1:3334/newuser",
+  "API_GET_NAME":"http://127.0.0.1:3334/user",
+  "API_GET_USERS":"http://127.0.0.1:3334/users",
+  "API_UPDATE_LESSON_BASE":"http://127.0.0.1:3334/lessonsUpdateNumber/",
+  "API_DELETE_USER_BASE":"http://127.0.0.1:3334/userDelete/"
+}

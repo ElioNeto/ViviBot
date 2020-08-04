@@ -1,3 +1,5 @@
 {
-  "prefix_translate":"!t"
+  "translatePrefix":"!t",
+  "monitorPrefix": "!m",
+  "materialPrefix": "!material"
 }

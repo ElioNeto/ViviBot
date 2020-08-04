@@ -3,10 +3,17 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "start": "node server",
+    "dev": "nodemon server"
+  },
   "dependencies": {
+    "@vitalets/google-translate-api": "^3.0.0",
+    "axios": "^0.19.2",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "mongoose": "^5.9.26",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "os-utils": "^0.0.14"
   }
 }
