@@ -17,6 +17,8 @@ client.login(process.env.TOKEN);
 //https://ingleswinner.com/blog/texto-em-ingles-para-expandir-vocabulario/
 //https://www.inglesnapontadalingua.com.br/
 
+
+
 const txt001 = {
   "title": "CAROL",
   "txt": "It was my birthday. My boyfriend Daniel came to my house to take me out for dinner. I opened the door, and he had a big bunch of flowers and a very nice car. He rented the car just to take me out. I was really surprised."
