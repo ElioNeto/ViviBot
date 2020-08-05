@@ -1,41 +1,64 @@
-const logger = require("../utils/logger.js").Logger;
 const Discord = require('discord.js')
 const dotenv = require('dotenv')
-const cmd = require('./commands')
-const material = require('./commands/material')
-
 const express = require('express'); 
 const mongoose = require('mongoose');
 
 const routes = require('./routes')
+const getText = require('./commands/tools/material')
+const cambridge = require('./commands/tools/cambridge')
+const server = require('./commands/ready')
+const ping = require('./commands/monitoring/ping')
+const mHelp = require('./commands/monitoring/help')
+const addUser = require('./commands/users/create')
+const uHelp = require('./commands/users/help')
+const readUser = require('./commands/users/read')
+const updateUser = require('./commands/users/udpate')
+const tHelp = require('./commands/tools/help')
+
+const logger = require("../utils/logger.js").Logger;
+
 const app = express();
+const db = mongoose.connection; 
+const client = new Discord.Client()
+
 mongoose.connect(process.env.MONGO, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false
 })
-const db = mongoose.connection; 
+
 db.on('connected', () => {console.log('Mongoose default connection is open');});
 db.on('error', err => {console.log(`Mongoose default connection has occured \n${err}`);});
 db.on('disconnected', () => {console.log('Mongoose default connection is disconnected');});
+
 app.use(express.json());
 app.use(routes);
 app.listen(3334);
-const client = new Discord.Client()
+
 dotenv.config()
 client.login(process.env.TOKEN);
+
 logger.server("Initializing Server...");
 
-cmd.start()
-cmd.guildCreate()
-cmd.guildDelete()
-cmd.ping()
-cmd.document()
-cmd.consoleMsg()
-cmd.addUser()
-cmd.addUserMsgCollector()
-cmd.getUserByName()
-cmd.getAllUsers()
-cmd.updateLessonNumber()
-cmd.help()
-material.getTxt()
+/* Server session */
+server.start()
+server.guildDelete()
+server.guildCreate()
+server.selfMention()
+
+/* Monitoring session */
+mHelp.start()
+ping.start()
+
+/* Auxiliar tools session */
+tHelp.start()
+getText.start()
+cambridge.start()
+
+/* CRUD Users */
+uHelp.start()
+addUser.start()
+addUser.lite()
+readUser.getAllUsers()
+readUser.getByName()
+updateUser.lesson()
